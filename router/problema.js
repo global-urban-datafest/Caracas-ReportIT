@@ -1,9 +1,11 @@
 var connection = require('../config/db'),
     Q          = require('q');
 
-exports.crearProblema = function(req, res){
-    	
-	var callback_1 = function() {
+
+	
+exports.crearProblema = function(req, res) {
+
+	var callback_1 = function(id_imagen, id_tipo_imagen) {
 		var deferred = Q.defer();
 		var sql = 
 			'SET @id_imagen = -1; ' +
@@ -14,7 +16,7 @@ exports.crearProblema = function(req, res){
 			
 		connection.db.query(
 			sql,
-			[req.body.imagen, req.body.tipoImagen],
+			[id_imagen, id_tipo_imagen],
 			function(err, result) {
 				if (err) deferred.reject(err);
 				
@@ -29,13 +31,13 @@ exports.crearProblema = function(req, res){
 		);
 	};
 	
-	var callback_2 = function(imagen) {
+	var callback_2 = function(id_imagen) {
 		var sql =
 			'SET @id_problema = -1; ' +
 			'INSERT INTO report_it.tb_problema (problema, latitud, altitud, id_tipo_problema, id_sub_categoria, id_municipio, id_estatus, id_usuario, id_dispositivo, id_grupo) ' +
 			'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?); ' +
 			(
-				imagen != null
+				id_imagen != null
 				?	'SET @id_problema = LAST_INSERT_ID(); ' +
 					'INSERT INTO report_it.tb_problema_imagen (id_problema, id_imagen) ' +
 					'VALUES (@id_problema, ?);'
@@ -49,14 +51,14 @@ exports.crearProblema = function(req, res){
 					req.body.problema,
 					req.body.latitud,
 					req.body.altitud,
-					req.body.tipoProblema,
-					req.body.subCategoria,
-					req.body.municipio,
-					req.body.estatus,
-					req.body.usuario,
-					req.body.dispositivo,
-					req.body.grupo,
-					imagen
+					req.body.id_tipo_problema,
+					req.body.id_sub_categoria,
+					req.body.id_municipio,
+					req.body.id_estatus,
+					typeof req.body.id_usuario !== undefined || req.body.id_usuario != null ? req.body.id_usuario : null,
+					typeof req.body.id_dispositivo !== undefined || req.body.id_dispositivo != null ? req.body.id_dispositivo : null,
+					typeof req.body.id_grupo !== undefined || req.body.id_grupo != null ? req.body.id_grupo : null,
+					id_imagen
 				],
 				function(err, result) {
 					if (err) throw err;
@@ -67,8 +69,8 @@ exports.crearProblema = function(req, res){
 		}
 	};
 	
-	if (req.body.imagen != null) {
-		callback_1(req.body.imagen).then(
+	if (typeof req.body.imagen !== undefined && req.body.imagen != null && typeof req.body.id_tipo_imagen !== undefined && req.body.id_tipo_imagen != null) {
+		callback_1(req.body.imagen, req.body.id_tipo_imagen).then(
 			callback_2,
 			function(err) {
 				throw err;
@@ -89,8 +91,8 @@ exports.certificarProblema = function(req, res) {
 		connection.db.query(
 			sql,
 			[
-				req.body.usuario,
-				req.body.problema
+				req.body.id_usuario,
+				req.body.id_problema
 			],
 			function(err, result) {
 				if (err) throw err;
@@ -104,14 +106,14 @@ exports.certificarProblema = function(req, res) {
 exports.comentarProblema = function(req, res) {
 	var sql =
 		'INSERT INTO report_it.tb_problema_comentario (id_problema, id_usuario, comentario) ' +
-		'VALUES (?, ?, ');';
+		'VALUES (?, ?, ?);';
 	
 	if (connection) {
 		connection.db.query(
 			sql,
 			[
-				req.body.problema,
-				req.body.usuario,
+				req.body.id_problema,
+				req.body.id_usuario,
 				req.body.comentario
 			],
 			function(err, result) {
@@ -123,7 +125,7 @@ exports.comentarProblema = function(req, res) {
 	}
 };
 
-exports.cambioEstatusProblema = function(req, res) {
+exports.cambiarEstatusProblema = function(req, res) {
 	var sql =
 		'UPDATE report_it.tb_problema ' +
 		'SET id_estatus = ? ' +
@@ -133,8 +135,8 @@ exports.cambioEstatusProblema = function(req, res) {
 		connection.db.query(
 			sql,
 			[
-				req.body.estatus,
-				req.body.problema
+				req.body.id_estatus,
+				req.body.id_problema
 			],
 			function(err, result) {
 				if (err) throw err;
