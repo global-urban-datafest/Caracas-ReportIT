@@ -480,18 +480,6 @@ head
                               each col in columnsName
                                 th(scope="col" style="") #{col}
                           tbody
-                            each dat,i in rowData
-                              tr
-                                td.col-md-6 #{dat.problema}                                                          
-                                td.col-md-2 #{dat.id_sub_categoria}  
-                                td.col-md-2 #{dat.id_municipio}  
-                                td.col-md-2 #{dat.usuario}
-                                td.col-md-2 
-                                  span.label.label-sm.label-success #{dat.estatus}
-                                td.col-md-2
-                                  .btn-group
-                                    a(class="btn btn-xs gray" href="#" data-toggle="modal" href="#large" data-close-others="true")
-                                      i.fa.fa-cog
                                     
                     #large.modal.fade.bs-modal-lg.in(tabindex='-1', role='dialog', aria-hidden='false')
                         .modal-dialog.modal-lg
@@ -1779,8 +1767,6 @@ head
  
     script(src='../public/plugins/gmaps.js', type='text/javascript')
 
-    script(src='socket.io/socket.io.js', type='text/javascript')
-    
     script(src='../public/javascripts/functions.js', type='text/javascript')
 
 

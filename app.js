@@ -40,37 +40,14 @@ app.get("/", function(req,res){
 			name : "yo!",
 			tituloTabla : 'Problemas presentados en el municipio xD',
 			actionTable : ['Editar', 'Borrar', 'Ir al problema'],
-			columnsName : ['Problema','Categoria','Municipio','Usuario afectado', 'Estatus', 'Seleccione'],
-			rowData 	: [
-				{
-					"latitud":"-66.857541",
-					"longitud":"10.493849",
-					"id_dispositivo":"1",
-					"estatus":"Reportado",
-					"id_municipio":1,
-					"id_sub_categoria":1,
-					"id_tipo_problema":1,
-					"usuario":"Yiin",
-					"problema":"Calle cerrada por construccion y lleva 2 meses la construccion"
-				},
-				{
-					"latitud":"-66.857541",	
-					"longitud":"10.493849",
-					"id_dispositivo":"1",
-					"estatus":"Reportado",
-					"id_municipio":1,
-					"id_sub_categoria":1,
-					"id_tipo_problema":1,
-					"usuario":"Yiinco",
-					"problema":"Poste de luz caido"
-				}
-			]
+			columnsName : ['Problema','Categoria','Municipio','Usuario afectado', 'Estatus', 'Seleccione']
+			//rowData 	: problema.buscarProblemas()
 		});
 });
 
 app.get('/test/:hola', func.algo);
 
-app.get('/pais', general.paises);
+app.get('/paises', general.paises);
 
 app.get('/pais/:id', general.pais);
 
@@ -92,17 +69,9 @@ app.post('/problema/certificar', problema.certificarProblema);
 app.post('/problema/comentar', problema.comentarProblema);
 app.put('/problema/cambiarEstatus', problema.cambiarEstatusProblema);
 
+
+
+
 http.createServer(app).listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));
-});
-
-
-var io = require("socket.io").listen(server);
-
-io.sockets.on('connection', function(socket) 
-{
-	socket.on("hola", function(username)
-	{
-		socket.emit("aja", {name:username});
-	});
 });
