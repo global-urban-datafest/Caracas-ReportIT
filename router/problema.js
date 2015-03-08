@@ -3,24 +3,36 @@ var connection = require('../config/db'),
 	
 exports.buscarProblemas = function(req, res) {
 	var sql = 
-		'SELECT ' +
-			'prob.problema AS problema, ' +
-			'prob.longitud AS longitud, ' +
-			'prob.latitud AS latitud, ' +
-			'prob.id_estatus AS id_estatus, ' +
-			'prob.id_municipio AS id_municipio, ' +
-			'prob.id_sub_categoria AS id_sub_categoria, ' +
-			'prob.id_tipo_problema AS id_tipo_problema, ' +
-			'prob.id_usuario AS id_usuario, ' +
-			'img.imagen ' +
-		'FROM ' +
-			'report_it.tb_problema AS prob ' +
-			'LEFT OUTER JOIN ' +
-			'report_it.tb_problema_imagen AS pi ' +
-			'ON prob.id_problema = pi.id_problema ' +
-			'LEFT OUTER JOIN ' +
-			'report_it.tb_imagen AS img ' +
-			'ON pi.id_imagen = img.id_imagen ' +
+		'SELECT ' + 
+			'prob.problema AS problema, ' + 
+			'prob.longitud AS longitud,  ' + 
+			'prob.latitud AS latitud, ' + 
+			'prob.id_estatus AS id_estatus, ' + 
+			'prob.id_municipio AS id_municipio, ' + 
+			'prob.id_sub_categoria AS id_sub_categoria, ' + 
+			'subcat.sub_categoria AS sub_categoria, ' + 
+			'prob.id_tipo_problema AS id_tipo_problema, ' + 
+			'tipoprob.tipo AS tipo_problema, ' + 
+			'prob.id_usuario AS id_usuario,  ' + 
+			'usuario.usuario AS usuario, ' + 
+			'img.imagen ' + 
+		'FROM  ' + 
+			'report_it.tb_problema AS prob ' + 
+			'INNER JOIN ' + 
+			'report_it.tb_tipo_problema AS tipoprob ' + 
+			'ON prob.id_tipo_problema =  tipoprob.id_tipo_problema ' + 
+			'INNER JOIN  ' + 
+			'report_it.tb_sub_categoria AS subcat ' + 
+			'ON prob.id_sub_categoria =  subcat.id_sub_categoria  ' + 
+			'INNER JOIN  ' + 
+			'report_it.tb_usuario AS usuario  ' + 
+			'ON prob.id_usuario =  usuario.id_usuario  ' + 
+			'LEFT OUTER JOIN  ' + 
+			'report_it.tb_problema_imagen AS pi  ' + 
+			'ON prob.id_problema = pi.id_problema  ' + 
+			'LEFT OUTER JOIN  ' + 
+			'report_it.tb_imagen AS img  ' + 
+			'ON pi.id_imagen = img.id_imagen  ' + 
 		'LIMIT 10;';
 		
 	if (connection) {
@@ -30,7 +42,7 @@ exports.buscarProblemas = function(req, res) {
 			function(err, result) {
 				if (err) throw err;
 				res.contentType('application/json');
-				res.write(JSON.stringify(result[0]));
+				res.write(JSON.stringify(result));
 				res.end();
 			});
 		}
