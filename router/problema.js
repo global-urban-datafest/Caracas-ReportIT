@@ -104,7 +104,7 @@ exports.certificarProblema = function(req, res) {
 exports.comentarProblema = function(req, res) {
 	var sql =
 		'INSERT INTO report_it.tb_problema_comentario (id_problema, id_usuario, comentario) ' +
-		'VALUES (?, ?, ');';
+		'VALUES (?, ?, '');';
 	
 	if (connection) {
 		connection.db.query(
