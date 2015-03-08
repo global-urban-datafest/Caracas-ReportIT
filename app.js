@@ -19,7 +19,7 @@ app.configure(function(){
 app.get("/", function(req,res){
 	res.render("index.jade", 
 		{
-			title : "Report.IT", 
+			title : "Report.IT ", 
 			name : "yo!",
 			tituloTabla : 'Problemas presentados en el municipio xD',
 			actionTable : ['Editar', 'Borrar', 'Ir al problema'],
