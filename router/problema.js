@@ -1,7 +1,40 @@
 var connection = require('../config/db'),
     Q          = require('q');
-
-
+	
+exports.buscarProblemas = function(req, res) {
+	var sql = 
+		'SELECT ' +
+			'prob.problema AS problema, ' +
+			'prob.longitud AS longitud, ' +
+			'prob.latitud AS latitud, ' +
+			'prob.id_estatus AS id_estatus, ' +
+			'prob.id_municipio AS id_municipio, ' +
+			'prob.id_sub_categoria AS id_sub_categoria, ' +
+			'prob.id_tipo_problema AS id_tipo_problema, ' +
+			'prob.id_usuario AS id_usuario, ' +
+			'img.imagen ' +
+		'FROM ' +
+			'report_it.tb_problema AS prob ' +
+			'LEFT OUTER JOIN ' +
+			'report_it.tb_problema_imagen AS pi ' +
+			'ON prob.id_problema = pi.id_problema ' +
+			'LEFT OUTER JOIN ' +
+			'report_it.tb_imagen AS img ' +
+			'ON pi.id_imagen = img.id_imagen ' +
+		'LIMIT 10;';
+		
+	if (connection) {
+		connection.db.query(
+			sql,
+			null,
+			function(err, result) {
+				if (err) throw err;
+				res.contentType('application/json');
+				res.write(JSON.stringify(result[0]));
+				res.end();
+			});
+		}
+};
 	
 exports.crearProblema = function(req, res) {
 
@@ -9,10 +42,10 @@ exports.crearProblema = function(req, res) {
 		var deferred = Q.defer();
 		var sql = 
 			'SET @id_imagen = -1; ' +
-			'INSERT INTO report_it.imagen (imagen, id_tipo_imagen) ' +
+			'INSERT INTO report_it.tb_imagen (imagen, id_tipo_imagen) ' +
 			'VALUES (?, ?); ' +
 			'SET @id_imagen = LAST_INSERT_ID(); ' +
-			'SELECT @id_imagen;';
+			'SELECT @id_imagen AS id_imagen;';
 			
 		connection.db.query(
 			sql,
@@ -20,21 +53,20 @@ exports.crearProblema = function(req, res) {
 			function(err, result) {
 				if (err) deferred.reject(err);
 				
-				if (result.length <= 0) {
-					res.contentType('application/json');
-					res.write(JSON.stringify({ msg : 'ERROR - ! - Error buscando datos' }));
-					res.end();
-				}					
+				if (result.length <= 0)
+					deferred.reject(JSON.stringify({ msg : 'ERROR - ! - Error buscando datos' }));				
 				else                   
-					deferred.resolve(result[0]);
+					deferred.resolve(result[3][0]['id_imagen']);
 			}
 		);
+		
+		return deferred.promise;
 	};
 	
 	var callback_2 = function(id_imagen) {
 		var sql =
 			'SET @id_problema = -1; ' +
-			'INSERT INTO report_it.tb_problema (problema, latitud, altitud, id_tipo_problema, id_sub_categoria, id_municipio, id_estatus, id_usuario, id_dispositivo, id_grupo) ' +
+			'INSERT INTO report_it.tb_problema (problema, latitud, longitud, id_tipo_problema, id_sub_categoria, id_municipio, id_estatus, id_usuario, id_dispositivo, id_grupo) ' +
 			'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?); ' +
 			(
 				id_imagen != null
@@ -50,14 +82,14 @@ exports.crearProblema = function(req, res) {
 				[
 					req.body.problema,
 					req.body.latitud,
-					req.body.altitud,
+					req.body.longitud,
 					req.body.id_tipo_problema,
 					req.body.id_sub_categoria,
 					req.body.id_municipio,
 					req.body.id_estatus,
-					typeof req.body.id_usuario !== undefined || req.body.id_usuario != null ? req.body.id_usuario : null,
-					typeof req.body.id_dispositivo !== undefined || req.body.id_dispositivo != null ? req.body.id_dispositivo : null,
-					typeof req.body.id_grupo !== undefined || req.body.id_grupo != null ? req.body.id_grupo : null,
+					typeof req.body.id_usuario !== undefined && req.body.id_usuario != null && req.body.id_usuario > 0 ? req.body.id_usuario : null,
+					typeof req.body.id_dispositivo !== undefined && req.body.id_dispositivo != null && req.body.id_dispositivo > 0 ? req.body.id_dispositivo : null,
+					typeof req.body.id_grupo !== undefined && req.body.id_grupo != null && req.body.id_grupo > 0 ? req.body.id_grupo : null,
 					id_imagen
 				],
 				function(err, result) {
@@ -69,7 +101,7 @@ exports.crearProblema = function(req, res) {
 		}
 	};
 	
-	if (typeof req.body.imagen !== undefined && req.body.imagen != null && typeof req.body.id_tipo_imagen !== undefined && req.body.id_tipo_imagen != null) {
+	if (typeof req.body.imagen !== undefined && req.body.imagen != null && typeof req.body.id_tipo_imagen !== undefined && req.body.id_tipo_imagen != null && req.body.id_tipo_imagen > 0) {
 		callback_1(req.body.imagen, req.body.id_tipo_imagen).then(
 			callback_2,
 			function(err) {

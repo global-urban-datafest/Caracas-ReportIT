@@ -9,8 +9,8 @@ var general  = require('./router/get'),
 
 app.set('port', process.env.PORT || 6969);
 	
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -39,6 +39,7 @@ app.get('/municipio/:id', general.municipio);
 app.get('/subcategorias', general.subcategorias);
 app.get('/subcategoria/:id', general.subcategoria);
 
+app.get('/problemas', problema.buscarProblemas);
 app.post('/problema', problema.crearProblema);
 app.post('/problema/certificar', problema.certificarProblema);
 app.post('/problema/comentar', problema.comentarProblema);
