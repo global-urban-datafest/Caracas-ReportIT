@@ -1,2 +1,6 @@
-# Caracas-ReportIT
-Hackaton Caracas 2015 - Smart Cities 
+chatNodeJSSocketIO
+==================
+
+Chat with nodejs and socket.io
+
+Simple chat with nodejs, soocket.io and bootstrap twitter.
